@@ -1,28 +1,46 @@
 const nodemailer = require('nodemailer');
+const {google}  = require('googleapis');
 
-const sendEmail = async options => {
-    // 1) Create a transporter
-    const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT*1,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD
-      }
-    });
-    console.log(transporter);
-    // 2) Define the email options
-    const mailOptions = {
-      from: 'Swift Cart <SwiftCart@gmail.com>',
-      to: options.email,
-      subject: options.subject,
-      text: options.message
-      // html:
-    };
+
+  const oAuth2Client = new google.auth.OAuth2(
+    process.env.GMAIL_CLIENT_ID,
+    process.env.GMAIL_CLIENT_SECRET,
+    process.env.GMAIL_REDIRECT_URI
+  );
+  oAuth2Client.setCredentials({refresh_token: process.env.GMAIL_REFRESH_TOKEN});
   
-    // 3) Actually send the email
-    await transporter.sendMail(mailOptions);
-  };
+  const sendEmail = async (to,subj,msg)=>{
+    const accessToken = await oAuth2Client.getAccessToken();
+
+    const transport = nodemailer.createTransport({
+      service:"gmail",
+      auth:{
+        type:"OAuth2",
+        user: process.env.GMAIL_USERNAME,
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+        accessToken:accessToken 
+      },
+      tls: {
+        rejectUnauthorized: true,
+      }
+    })
+
+  const from = process.env.GMAIL_USERNAME;
+
+  return new Promise((resolve, reject) => {
+    transport.sendMail({ from, subject:subj, to,text: msg }, (err, info) => {
+      if (err) reject(err);
+      resolve(info);
+    });
+  });
+
+  }
+
+  
   
   module.exports = sendEmail;
   
+
+

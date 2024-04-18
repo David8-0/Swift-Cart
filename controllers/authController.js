@@ -1,6 +1,7 @@
 const userModel = require('./../Models/userModel');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../utilities/email')
+const crypto = require('crypto');
 
 const signToken = (id)=>{
     return jwt.sign({id},process.env.JWT_SECRET_KEY,{ expiresIn:process.env.JWT_EXPIRE_IN })
@@ -62,12 +63,12 @@ exports.forgotPassword=async (req,res)=>{
 
   const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
-  
-    sendEmail({
-      email: user.email,
-      subject: 'Your password reset token (valid for 10 min)',
+    sendEmail(
+        user.email,
+      'Your password reset token (valid for 10 min)',
       message
-    }).then(() => {
+    //}
+).then(() => {
         res.status(200).json({
             status: 'success',
             message: 'Token sent to email!'
@@ -86,9 +87,54 @@ exports.forgotPassword=async (req,res)=>{
     }
 }
 
-exports.resetPassword=(req,res) => {
-
+exports.resetPassword=async(req,res) => {
+    try{
+        const hashedToken = crypto.createHash('sha256').update(req.params.resetToken).digest('hex');
+        const user = await userModel.findOne({passwordResetToken:hashedToken,passwordResetTokenExpire:{$gte:Date.now()}})
+        if(!user){
+            return res.status(400).json({
+                status:'fail',
+                message: 'Invalid password reset token'
+            })}
+        user.password = req.body.password;
+        user.confirmPassword = req.body.confirmPassword;
+        user.passwordResetToken=undefined;
+        user.passwordResetTokenExpire = undefined;
+        await user.save();
+        const token = signToken(user._id);
+        res.status(200).json({
+            status: 'success',
+            token
+        });
+         }catch(err){
+            res.status(400).json({status:"fail",message: err.message});
+        }
 }
+
+exports.updatePassword = async(req,res)=>{
+    try{
+        //const user =await userModel.findById(req.fresUser._id);
+        const user = req.freshUser;
+        console.log(user);
+        if(!user.correctPassword(req.body.oldPassword,user.password)){
+            return res.status(403).json({
+                status:'fail',
+                message: 'Invalid password'
+            });
+        }
+        user.password = req.body.newPassword;
+        user.confirmPassword = req.body.newConfirmPassword;
+        await user.save();
+        const token = signToken(user._id);
+        res.status(200).json({
+            status:'success',
+            token,
+        });
+    }catch (err) {
+        res.status(400).json({status:"fail",message: err.message});
+    }
+}
+
 
 //* middlewares
 exports.protect = async (req,res,next) => {

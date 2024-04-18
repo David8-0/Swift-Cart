@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const productModel = require('./productModel')
+
 
 const userScehma = new mongoose.Schema({
   name: {
@@ -40,7 +42,16 @@ const userScehma = new mongoose.Schema({
   },
   img: String,
   passwordResetToken:String,
-  passwordResetTokenExpire:Date
+  passwordResetTokenExpire:Date,
+//~ relationships
+  sellerProducts:[
+    {
+      type:mongoose.Schema.ObjectId,
+      ref:'product'
+    }
+  ],
+  favorites:Array,
+  cart:Array
 });
 
 userScehma.pre('save', async function (next) {
@@ -49,6 +60,33 @@ userScehma.pre('save', async function (next) {
   this.confirmPassword = undefined;
   next();
 });
+userScehma.pre(/^find/,async function (next) {
+  this.populate('sellerProducts');
+  next();
+});
+
+userScehma.pre('save', async function (next) {
+   
+  let cartPromise = this.cart.map( async id=> await productModel.findById(id));
+  let favoritspromise=this.favorites.map( async id=> await productModel.findById(id));
+  
+  this.favorites =await Promise.all(favoritspromise);
+  console.log(this.favorites);
+  this.cart =await Promise.all(cartPromise);
+  
+  next();
+})
+
+userScehma.methods.addToCart= async (...productsid)=>{
+  let products =await productsid.map(async (id)=> await productModel.findById(id));
+  this.cart.push(products);
+}
+
+userScehma.methods.addToFav= async (...productsid)=>{
+  let products =await productsid.map(async (id)=> await productModel.findById(id));
+  this.favorites.push(products);
+}
+
 userScehma.methods.correctPassword = async (candidatePassword,userPasswords) => {
     return await bcrypt.compare(candidatePassword, userPasswords);
 }

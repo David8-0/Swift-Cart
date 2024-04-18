@@ -1,6 +1,5 @@
 const express = require('express');
 const morgan = require('morgan');
-const toursRouter = require('./Routes/tourRoutes');
 const usersRouter = require('./Routes/userRoutes');
 const productRouter = require('./Routes/productRoutes');
 const mongoose = require('mongoose');
@@ -20,7 +19,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 console.log(process.env.NODE_ENV);
 app.use(express.static(`${__dirname}/public`));
-app.use('/api/v1/tours', toursRouter);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/product', productRouter);
 
