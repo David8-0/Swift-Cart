@@ -1,5 +1,6 @@
 const productModel= require('../Models/productModel');
 const APIFeatures = require('./../utilities/APIFeatures');
+const userModel = require('./../Models/userModel')
 exports.topSellingAlias=(req,res,next)=>{
     req.query.sort='-productSales';
     req.query.limit='2';
@@ -7,7 +8,11 @@ exports.topSellingAlias=(req,res,next)=>{
 }
 exports.createProduct = async(req,res)=>{
     try{
+    const userId = req.freshUser._id;
+    const user = await userModel.findById(userId);
     const newProduct = await productModel.create(req.body);
+    user.sellerProducts.push(newProduct);
+    user.save({validateBeforeSave:false});
     res.status(201).json({
         status:'success',
         data:{
@@ -82,6 +87,23 @@ exports.deleteProductById = async(req,res)=>{
         res.status(400).json({status:"fail",message: err.message});
     }
 }
+
+exports.getSellerProducts= async(req, res)=>{
+    try{
+        const id = req.params.id;
+        const user = await userModel.findById(id);
+        
+        res.status(200).json({
+            status:'success',
+            data:{
+                sellerProducts:user.sellerProducts
+            }
+        });
+    }catch(err){
+        res.status(400).json({status:"fail",message: err.message});
+    }
+}
+
 //! get stats using aggregate functions
 exports.getStatus = async (req, res)=> {
     try{

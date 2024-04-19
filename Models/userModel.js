@@ -43,6 +43,8 @@ const userScehma = new mongoose.Schema({
   img: String,
   passwordResetToken:String,
   passwordResetTokenExpire:Date,
+  address:String,
+  city:String,
 //~ relationships
   sellerProducts:[
     {
@@ -60,6 +62,7 @@ const userScehma = new mongoose.Schema({
   }
 });
 
+//~ Middlwares
 
 //*hashing password
 userScehma.pre('save', async function (next) {
@@ -75,18 +78,8 @@ userScehma.pre(/^find/,async function (next) {
   next();
 });
 
-// userScehma.pre('save', async function (next) {
-   
-//   let cartPromise = this.cart.map( async id=> await productModel.findById(id));
-//   let favoritspromise=this.favorites.map( async id=> await productModel.findById(id));
-  
-//   this.favorites =await Promise.all(favoritspromise);
-//   console.log(this.favorites);
-//   this.cart =await Promise.all(cartPromise);
-  
-//   next();
-// })
-//* cart and favorite handling
+//************************************************************** */
+//* cart  handling
 
 const getTotalPrice = (arr) => {
   return  arr.reduce((total,item)=>total + (item.price*item.productQuantity),0);
@@ -116,11 +109,25 @@ userScehma.methods.removeFromCart = async function(productid){
     this.markModified('cart');
     this.save({validateBeforeSave:false});
 }
-userScehma.methods.addToFav= async (productid)=>{
-  let products =await productsid.map(async (id)=> await productModel.findById(id));
-  this.favorites.push(products);
+//************************************************************** */
+//& favorites handling
+
+userScehma.methods.addToFav= async function (productid){
+  let product =await productModel.findById(productid);
+  const productExist = await this.favorites.find(doc => doc._id.equals(productid));
+  if(productExist) throw new Error('product already exists in your favorites');
+  this.favorites.push(product);
+  this.save({validateBeforeSave:false});
+}
+userScehma.methods.removeFromFav= async function (productid){
+  const productExist = await this.favorites.find(doc => doc._id.equals(productid));
+  if(!productExist) throw new Error('product does not exists in your favorites');
+  const productExistIndex = this.favorites.findIndex(doc => doc._id.equals(productid));
+  this.favorites.splice(productExistIndex, 1);
+  this.save({validateBeforeSave:false});
 }
 //************************************************************** */
+//! authentication handling
 userScehma.methods.correctPassword = async (candidatePassword,userPasswords) => {
     return await bcrypt.compare(candidatePassword, userPasswords);
 }

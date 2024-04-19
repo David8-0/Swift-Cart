@@ -10,10 +10,10 @@ router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
 router.route('/updatePassword').patch(authController.protect,authController.updatePassword);
 
-router.route('/favorites').post(authController.protect);
 
 
 router.route('/').get(userController.getAllUsers);
+
 router
   .route('/:id')
   .get(authController.protect,userController.getuser)
