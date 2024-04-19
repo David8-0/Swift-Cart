@@ -28,6 +28,10 @@ const productSchema = new mongoose.Schema({
   productSales:{
     type:Number,
     default: 0
+  },
+  productQuantity:{
+    type:Number,
+    default: 1
   }
 });
 

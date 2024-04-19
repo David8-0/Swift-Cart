@@ -9,7 +9,7 @@ router.route('/login').post(authController.login);
 router.route('/forgotPassword').post(authController.forgotPassword);
 router.route('/resetPassword/:resetToken').patch(authController.resetPassword);
 router.route('/updatePassword').patch(authController.protect,authController.updatePassword);
-router.route('/cart').post(authController.protect,userController.addToMyCart);
+
 router.route('/favorites').post(authController.protect);
 
 

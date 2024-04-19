@@ -63,14 +63,7 @@ exports.getAllUsers=async function(req, res) {
     }
   }
 
-exports.addToMyCart = async function (req, res) {
-    try{
-      const user = await userModel.findById(req.freshUser._id);
-      await user.addToCart(req.body.product)
-    }catch(err){
-        res.status(400).json({status:"fail",message: err.message});
-    }
-}
+
 
 
 //   try{

@@ -3,7 +3,7 @@ const morgan = require('morgan');
 const usersRouter = require('./Routes/userRoutes');
 const productRouter = require('./Routes/productRoutes');
 const mongoose = require('mongoose');
-
+const cartRouter = require('./Routes/cartRoutes')
 const app = express();
 
 mongoose
@@ -21,5 +21,7 @@ console.log(process.env.NODE_ENV);
 app.use(express.static(`${__dirname}/public`));
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/product', productRouter);
+app.use('/api/v1/cart', cartRouter);
+
 
 module.exports = app;
