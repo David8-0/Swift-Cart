@@ -18,9 +18,7 @@ const orderSchema = new mongoose.Schema({
     totalPrice:Number
 });
 
-const getTotalPrice = (arr) => {
-    return  arr.reduce((total,item)=>total + (item.price*item.productQuantity),0);
-  }
+
 
   orderSchema.pre(/^find/, async function(next){
     this.populate('products').populate('user');
