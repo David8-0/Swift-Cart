@@ -1,6 +1,62 @@
 const productModel= require('../Models/productModel');
 const APIFeatures = require('./../utilities/APIFeatures');
 const userModel = require('./../Models/userModel')
+const multer  = require('multer');
+const sharp = require('sharp');
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req,file,cb)=>{
+  if(file.mimetype.startsWith('image')){
+    cb(null,true);
+  }else{
+    const error = new Error('Only image files are allowed!');
+    error.statusCode = 400;
+    cb(error,false);
+  }
+}
+const upload = multer({
+    storage: multerStorage,
+    fileFilter: multerFilter
+})
+
+exports.uploadProductImages = upload.fields([
+    {name:'imageCover', maxCount:1},
+    {name:'images', maxCount:4}
+])
+
+exports.resizeImages = async (req,res,next) => {
+    try{
+        if(!req.files.imageCover || !req.files.images) return next();
+        const imageCoverFileName = `product-${req.params.id}-${Date.now()}-cover`;
+        await sharp(req.files.imageCover[0].buffer)
+        .resize(2000,1333)
+        .toFormat('jpeg')
+        .jpeg({quality:90}).
+        toFile(`public/images/products/${imageCoverFileName}.jpg`);
+        req.body.imageCover=`http://127.0.0.1:3000/images/products/${imageCoverFileName}.jpg`;
+    
+
+        req.body.images=[];
+        await Promise.all(
+            req.files.images.map(async (img,i)=>{
+                const imageFileName = `product-${req.params.id}-${Date.now()}-${i}`;
+                await sharp(req.files.images[i].buffer)
+                .resize(500,500)
+                .toFormat('jpeg')
+                .jpeg({quality:90}).
+                toFile(`public/images/products/${imageFileName}.jpg`);
+                req.body.images.push(`http://127.0.0.1:3000/images/products/${imageFileName}.jpg`)
+            })
+        )
+
+
+        next();
+      }catch(err){
+        res.status(400).json({status:"fail",message: err.message});
+      }
+}
+
 exports.topSellingAlias=(req,res,next)=>{
     req.query.sort='-productSales';
     req.query.limit='2';

@@ -20,6 +20,7 @@ const productSchema = new mongoose.Schema({
     type:String,
     required: [true, 'a product must have image cover']
   },
+  imageCover:String,
   images:[String],
   creationDate: {
     type:Date,

@@ -25,6 +25,8 @@ router.route('/:id')
 .get(productController.getProduct)
 .patch(authController.protect,
     authController.restrictTo('seller'),
+    productController.uploadProductImages,
+    productController.resizeImages,
     productController.updateProduct)
 
 .delete(authController.protect,

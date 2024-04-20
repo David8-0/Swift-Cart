@@ -40,7 +40,10 @@ const userScehma = new mongoose.Schema({
     type: Number,
     min: 12,
   },
-  img: String,
+  img: {
+    type: String,
+    default:'default.jpg'
+  },
   passwordResetToken:String,
   passwordResetTokenExpire:Date,
   address:String,
