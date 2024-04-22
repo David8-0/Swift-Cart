@@ -21,20 +21,20 @@ const upload = multer({
 })
 
 exports.uploadProductImages = upload.fields([
-    {name:'imageCover', maxCount:1},
+    {name:'imgCover', maxCount:1},
     {name:'images', maxCount:4}
 ])
 
 exports.resizeImages = async (req,res,next) => {
     try{
-        if(!req.files.imageCover || !req.files.images) return next();
+        if(!req.files.imgCover || !req.files.images) return next();
         const imageCoverFileName = `product-${req.params.id}-${Date.now()}-cover`;
-        await sharp(req.files.imageCover[0].buffer)
+        await sharp(req.files.imgCover[0].buffer)
         .resize(2000,1333)
         .toFormat('jpeg')
         .jpeg({quality:90}).
         toFile(`public/images/products/${imageCoverFileName}.jpg`);
-        req.body.imageCover=`http://127.0.0.1:3000/images/products/${imageCoverFileName}.jpg`;
+        req.body.imgCover=`http://127.0.0.1:3000/images/products/${imageCoverFileName}.jpg`;
     
 
         req.body.images=[];
@@ -54,6 +54,7 @@ exports.resizeImages = async (req,res,next) => {
         next();
       }catch(err){
         res.status(400).json({status:"fail",message: err.message});
+        //console.log(err);
       }
 }
 

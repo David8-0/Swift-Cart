@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 const sendEmail = require('./../utilities/email')
 const crypto = require('crypto');
 
-const signToken = (id)=>{
-    return jwt.sign({id},process.env.JWT_SECRET_KEY,{ expiresIn:process.env.JWT_EXPIRE_IN })
+const signToken = (id,name,email,img,age,role,address)=>{
+    return jwt.sign({id,name,email,img,age,role,address},process.env.JWT_SECRET_KEY,{ expiresIn:process.env.JWT_EXPIRE_IN });
 }
 
 
@@ -19,7 +19,15 @@ exports.signup = async (req,res) => {
             Age:req.body.Age,
             role:req.body.role
         });
-        const token = signToken(newUser._id);
+        const token = signToken(
+            newUser._id,
+            newUser.name ,
+            newUser.email,
+            newUser.img,
+            newUser.Age,
+            newUser.role,
+            newUser.address
+        );
 
         res.status(200).json({
             status:'success',
@@ -38,7 +46,15 @@ exports.login = async (req,res) => {
         
         const user = await userModel.findOne({email:email}).select('+password');
         if(!user || !await user.correctPassword(password,user.password)) throw new Error("email or password is not correct");
-        const token = signToken(user._id);
+        const token = signToken(
+            user._id,
+            user.name ,
+            user.email,
+            user.img,
+            user.Age,
+            user.role,
+            user.address
+        );
 
         res.status(200).json({
             status:'success',
@@ -101,7 +117,15 @@ exports.resetPassword=async(req,res) => {
         user.passwordResetToken=undefined;
         user.passwordResetTokenExpire = undefined;
         await user.save();
-        const token = signToken(user._id);
+        const token = signToken(
+            user._id,
+            user.name ,
+            user.email,
+            user.img,
+            user.Age,
+            user.role,
+            user.address
+        );
         res.status(200).json({
             status: 'success',
             token
@@ -125,7 +149,15 @@ exports.updatePassword = async(req,res)=>{
         user.password = req.body.newPassword;
         user.confirmPassword = req.body.newConfirmPassword;
         await user.save();
-        const token = signToken(user._id);
+        const token = signToken(
+            user._id,
+            user.name ,
+            user.email,
+            user.img,
+            user.Age,
+            user.role,
+            user.address
+        );
         res.status(200).json({
             status:'success',
             token,
