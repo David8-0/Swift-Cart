@@ -6,34 +6,34 @@ const productSchema = new mongoose.Schema({
     required: [true, 'a product must have name'],
     unique: true,
   },
-  rating:{
-    type:Number,
-    default:0
+  rating: {
+    type: Number,
+    default: 0,
   },
-  price:{
-    type:Number,
-    Required: [true, 'a product must have price']
+  price: {
+    type: Number,
+    Required: [true, 'a product must have price'],
   },
-  priceDiscount:Number,
+  priceDiscount: Number,
   description: String,
   imgCover: {
-    type:String,
-    required: [true, 'a product must have image cover']
+    type: String,
+    required: [true, 'a product must have image cover'],
   },
-  images:[String],
+  images: [String],
   creationDate: {
-    type:Date,
-    default: Date.now()
+    type: Date,
+    default: Date.now(),
   },
-  productSales:{
-    type:Number,
-    default: 0
+  productSales: {
+    type: Number,
+    default: 0,
   },
-  productQuantity:{
-    type:Number,
-    default: 1
-  }
+  productQuantity: {
+    type: Number,
+    default: 1,
+  },
+  category: String,
 });
 
-
-module.exports = productModel = mongoose.model('product',productSchema);
+module.exports = productModel = mongoose.model('product', productSchema);

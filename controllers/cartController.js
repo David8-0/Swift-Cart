@@ -68,6 +68,23 @@ exports.getMyCart = async (req,res)=>{
   }
 }
 
+exports.deleteFromMyCart= async (req,res)=>{
+  try{
+    const user = await userModel.findById(req.freshUser._id);
+  //   console.log(user);
+    await user.deleteFromCart(req.body.productId);
+    res.status(200).json({
+      status:'success',
+      data:{
+          cart:user.cart,
+          numberOfItems:user.cart.products.length
+      }
+    })  
+  }catch(err){
+      res.status(400).json({status:"fail",message: err.message});
+  }
+}
+
 
 
 

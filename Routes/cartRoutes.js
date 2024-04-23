@@ -13,5 +13,5 @@ router.route('/')
 .post(authController.protect,cartController.addToMyCart)
 .delete(authController.protect,cartController.clearMyCart)
 .patch(authController.protect,cartController.removeFromMyCart)
-
+.put(authController.protect,cartController.deleteFromMyCart)
 module.exports = router;

@@ -112,6 +112,15 @@ userScehma.methods.removeFromCart = async function(productid){
     this.markModified('cart');
     this.save({validateBeforeSave:false});
 }
+userScehma.methods.deleteFromCart = async function(productid){
+  const productExist = await this.cart.products.find(doc => doc._id.equals(productid));
+  if(!productExist) throw new Error("product doesn't exist in cart");
+  const productExistIndex = this.cart.products.findIndex(doc => doc._id.equals(productid));
+      this.cart.products.splice(productExistIndex, 1);
+      this.cart.totalPrice= getTotalPrice(this.cart.products);
+    this.markModified('cart');
+    this.save({validateBeforeSave:false});
+}
 //************************************************************** */
 //& favorites handling
 
