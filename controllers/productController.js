@@ -136,9 +136,10 @@ exports.updateProduct = async(req, res) =>{
 exports.deleteProductById = async(req,res)=>{
     try{
         await productModel.findByIdAndDelete(req.params.id);
-        res.status(204).json({
+        var newData = await productModel.find();
+        res.status(202).json({
             status:'success',
-            data:null
+            data:newData
         });
     }catch(err){
         res.status(400).json({status:"fail",message: err.message});
