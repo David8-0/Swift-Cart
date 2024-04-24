@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const productModel = require('./productModel')
+const productModel = require('./productModel');
+const { log } = require('console');
 
 
 const userScehma = new mongoose.Schema({
@@ -141,7 +142,16 @@ userScehma.methods.removeFromFav= async function (productid){
 //************************************************************** */
 //! authentication handling
 userScehma.methods.correctPassword = async (candidatePassword,userPasswords) => {
-    return await bcrypt.compare(candidatePassword, userPasswords);
+    try{
+      //console.log(`oldpassword ${candidatePassword}`);
+      //console.log(`has password ${userPasswords}`); //* msh berg3 b hashed password
+      const result =await bcrypt.compare(candidatePassword, userPasswords);
+      //console.log(result);
+      return result
+    }catch(err){
+      console.log(err);
+      return false;
+    }
 }
 userScehma.methods.createResetToken=function(){
     const resetToken = crypto.randomBytes(16).toString('hex');

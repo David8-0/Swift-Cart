@@ -67,6 +67,7 @@ exports.getAllUsers=async function(req, res) {
  
   exports.getuser=async function(req, res) {
     try{
+      
       const user =await userModel.findById(req.params.id);
       res.status(200).json({
         status: 'success',
@@ -80,7 +81,7 @@ exports.getAllUsers=async function(req, res) {
   }
   exports.updateUser=async function(req, res) {
     try{
-      const allowedObj = filterObj(req.body,'name','email','sellerProducts','favorites','cart');
+      const allowedObj = filterObj(req.body,'name','email','sellerProducts','favorites','cart','phone','Age','address');
       if(req.file) allowedObj.img = req.file.filename;
       const updatedUser= await userModel.findByIdAndUpdate(req.freshUser._id,allowedObj,{
         runValidators: true,

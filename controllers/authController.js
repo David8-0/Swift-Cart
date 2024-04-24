@@ -2,6 +2,7 @@ const userModel = require('./../Models/userModel');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('./../utilities/email')
 const crypto = require('crypto');
+const { log } = require('console');
 
 const signToken = (id,name,email,img,age,role,address)=>{
     return jwt.sign({id,name,email,img,age,role,address},process.env.JWT_SECRET_KEY,{ expiresIn:process.env.JWT_EXPIRE_IN });
@@ -137,10 +138,13 @@ exports.resetPassword=async(req,res) => {
 
 exports.updatePassword = async(req,res)=>{
     try{
-        //const user =await userModel.findById(req.fresUser._id);
-        const user = req.freshUser;
-        console.log(user);
-        if(!user.correctPassword(req.body.oldPassword,user.password)){
+        //console.log(req.freshUser);
+        const user =await userModel.findById(req.freshUser._id).select('password');
+        //const user = req.freshUser;
+        //console.log(req.fresUser);
+        console.log(user.password);
+        if(!await user.correctPassword(req.body.oldPassword,user.password)){
+            console.log("here is wrong password");
             return res.status(403).json({
                 status:'fail',
                 message: 'Invalid password'
@@ -171,6 +175,7 @@ exports.updatePassword = async(req,res)=>{
 //* middlewares
 exports.protect = async (req,res,next) => {
     try{
+
         if(!req.headers.authorization || !req.headers.authorization.startsWith('Bearer')) throw new Error("Token must be provided");
         const token = req.headers.authorization.split(' ')[1];
         jwt.verify(token,process.env.JWT_SECRET_KEY,async(err,decoded)=>{
@@ -181,6 +186,7 @@ exports.protect = async (req,res,next) => {
             const fresUser = await userModel.findById(decoded.id);
             if(!fresUser) throw new Error("User not found please log in again");
             req.freshUser = fresUser;
+            
             next();
         })
        
