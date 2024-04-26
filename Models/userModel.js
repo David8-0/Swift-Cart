@@ -43,7 +43,8 @@ const userScehma = new mongoose.Schema({
   },
   img: {
     type: String,
-    default:'default.jpg'
+    default:`http://127.0.0.1:3000/images/users/default.jpg`
+    
   },
   passwordResetToken:String,
   passwordResetTokenExpire:Date,
@@ -122,7 +123,7 @@ userScehma.methods.deleteFromCart = async function(productid){
     this.markModified('cart');
     this.save({validateBeforeSave:false});
 }
-//************************************************************** */
+//************************************************************* */
 //& favorites handling
 
 userScehma.methods.addToFav= async function (productid){

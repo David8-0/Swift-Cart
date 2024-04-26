@@ -27,7 +27,7 @@ exports.uploadProductImages = upload.fields([
 
 exports.resizeImages = async (req,res,next) => {
     try{
-        if(!req.files.imgCover || !req.files.images) return next();
+        if(req.files.imgCover ){  //|| !req.files.images
         const imageCoverFileName = `product-${req.params.id}-${Date.now()}-cover`;
         await sharp(req.files.imgCover[0].buffer)
         .resize(2000,1333)
@@ -35,8 +35,8 @@ exports.resizeImages = async (req,res,next) => {
         .jpeg({quality:90}).
         toFile(`public/images/products/${imageCoverFileName}.jpg`);
         req.body.imgCover=`http://127.0.0.1:3000/images/products/${imageCoverFileName}.jpg`;
-    
-
+        }
+        if(req.files.images){
         req.body.images=[];
         await Promise.all(
             req.files.images.map(async (img,i)=>{
@@ -49,7 +49,7 @@ exports.resizeImages = async (req,res,next) => {
                 req.body.images.push(`http://127.0.0.1:3000/images/products/${imageFileName}.jpg`)
             })
         )
-
+    }
 
         next();
       }catch(err){
@@ -122,6 +122,7 @@ exports.updateProduct = async(req, res) =>{
             new:true,
             runValidators:true
         });
+
         res.status(200).json({
             status:'success',
             data:{newProudct}

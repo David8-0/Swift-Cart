@@ -10,6 +10,12 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  category:{
+    type:String,
+    required: [true, "category is required"],
+    enum:["Electronics","Food","Jewelry","Games","Fashion","Sports","other"]
+  },
+  brand:String,
   price: {
     type: Number,
     Required: [true, 'a product must have price'],
@@ -17,8 +23,7 @@ const productSchema = new mongoose.Schema({
   priceDiscount: Number,
   description: String,
   imgCover: {
-    type: String,
-    required: [true, 'a product must have image cover'],
+    type: String
   },
   images: [String],
   creationDate: {

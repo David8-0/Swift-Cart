@@ -76,9 +76,9 @@ exports.forgotPassword=async (req,res)=>{
         const resetToken = user.createResetToken();
         await user.save({validateBeforeSave: false});
         
-        const resetURL = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+        const resetURL = `${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+  const message = `Forgot your password? use this code to reset your password: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
     sendEmail(
         user.email,
