@@ -27,7 +27,7 @@ exports.uploadProductImages = upload.fields([
 
 exports.resizeImages = async (req,res,next) => {
     try{
-        if(req.files.imgCover ){  //|| !req.files.images
+        if(req.files?.imgCover ){  //|| !req.files.images
         const imageCoverFileName = `product-${req.params.id}-${Date.now()}-cover`;
         await sharp(req.files.imgCover[0].buffer)
         .resize(2000,1333)
@@ -36,7 +36,7 @@ exports.resizeImages = async (req,res,next) => {
         toFile(`public/images/products/${imageCoverFileName}.jpg`);
         req.body.imgCover=`http://127.0.0.1:3000/images/products/${imageCoverFileName}.jpg`;
         }
-        if(req.files.images){
+        if(req.files?.images){
         req.body.images=[];
         await Promise.all(
             req.files.images.map(async (img,i)=>{
