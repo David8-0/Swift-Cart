@@ -7,7 +7,7 @@ exports.addToMyCart = async  (req, res)=> {
     try{
       const user = await userModel.findById(req.freshUser._id);
     //   console.log(user);
-      await user.addToCart(req.body.productId);
+      await user.addToCart(req.body.productId,req.body.num);
       res.status(200).json({
         status:'success',
         data:{

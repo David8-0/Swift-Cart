@@ -21,6 +21,7 @@ const productSchema = new mongoose.Schema({
     Required: [true, 'a product must have price'],
   },
   priceDiscount: Number,
+  actualPrice:Number,
   description: String,
   imgCover: {
     type: String
@@ -38,7 +39,38 @@ const productSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
+  amount: {
+    type: Number,
+    default: 0,
+  },
   category: String,
 });
+
+productSchema.pre('save',function(next){
+  if(this.priceDiscount>0){
+    this.actualPrice = this.price - this.priceDiscount;
+
+  }else{
+    this.actualPrice = this.price;
+  }
+  this.markModified('actualPrice');
+  //this.save({validateBeforeSave:false});
+  next();
+});
+
+productSchema.methods.updateActualPrice=function() {
+  if(this.priceDiscount>0){
+    this.actualPrice = this.price - this.priceDiscount;
+
+  }else{
+    this.actualPrice = this.price;
+  }
+  this.markModified('actualPrice');
+  console.log('accc');
+  this.save({validateBeforeSave:false});
+}
+
+
+
 
 module.exports = productModel = mongoose.model('product', productSchema);

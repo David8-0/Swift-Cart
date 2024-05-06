@@ -15,7 +15,12 @@ const orderSchema = new mongoose.Schema({
         type:Date,
         default: Date.now()
     },
-    totalPrice:Number
+    totalPrice:Number,
+    status:{
+        type:String,
+        enum:["Pending","Processing","Shipped","OutForDelivery","Delivered","Cancelled","Returned","Refunded"],
+        default:"Pending"
+    }
 });
 
 

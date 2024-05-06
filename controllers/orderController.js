@@ -19,7 +19,7 @@ exports.getAllOrders = async (req,res) => {
 
 exports.createOrder = async (req,res) => {
     try{
-        const userId = req.params.id;
+        const userId = req.freshUser._id;
         const user = await userModel.findById(userId);
         if(!user) throw new Error("invalid user id");
         const newOrder = await orderModel.create({
@@ -44,7 +44,7 @@ exports.createOrder = async (req,res) => {
 exports.getUserOrders = async (req,res)=>{
   
   try{
-    const userId = req.params.id;
+    const userId = req.freshUser._id;
     const user = await userModel.findById(userId);
     if(!user) throw new Error("invalid user id");
     const userOrders = await orderModel.find({user:user})

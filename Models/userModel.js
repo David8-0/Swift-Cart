@@ -87,15 +87,18 @@ userScehma.pre(/^find/,async function (next) {
 //* cart  handling
 
 const getTotalPrice = (arr) => {
-  return  arr.reduce((total,item)=>total + (item.price*item.productQuantity),0);
+  return  arr.reduce((total,item)=>total + (item.actualPrice*item.productQuantity),0);
 }
 
-userScehma.methods.addToCart= async function(productid){
+userScehma.methods.addToCart= async function(productid,num){
   let product =await productModel.findById(productid); 
   const productExist = await this.cart.products.find(doc => doc._id.equals(productid));
   if(productExist){
-    productExist.productQuantity++;
+    if(num) productExist.productQuantity+=num;
+    else productExist.productQuantity++;
   }else{
+    if(num)  product.productQuantity = num;
+    else product.productQuantity++;
     this.cart.products.push(product);
   }
   this.cart.totalPrice= getTotalPrice(this.cart.products);

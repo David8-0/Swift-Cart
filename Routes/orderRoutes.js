@@ -6,10 +6,12 @@ const router = express.Router();
 
 router.route('/')
 .get(authController.protect,orderController.getAllOrders)
+.post(authController.protect,orderController.createOrder)
+.get(authController.protect,orderController.getUserOrders)
 // .patch(authController.protect,orderController.updateOrder);
 
-router.route('/:id')
-.get(authController.protect,orderController.getUserOrders)
-.post(authController.protect,orderController.createOrder)
+
+
+
 
 module.exports = router;

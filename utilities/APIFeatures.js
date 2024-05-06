@@ -1,4 +1,5 @@
 module.exports=class APIFeatures{
+    length=0;
     constructor(query,queryString){
         this.query = query;
         this.queryString = queryString;
@@ -10,9 +11,15 @@ module.exports=class APIFeatures{
         const execlude = ['page','sort','order','limit'];
         execlude.forEach(el=> delete queryObj[el]);
         //* advanced filtering
-        let queryStr = JSON.stringify(queryObj);    
+        let queryStr = JSON.stringify(queryObj);   
+        if(queryObj['name']){
+            console.log(`name is ${queryObj['name']}`);
+            const regex = new RegExp(`^${queryObj['name']}`, 'i');
+            this.query =  this.query.find({ name: { $regex: regex } });
+            return this;
+        }
         queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g,match=>`$${match}`);
-
+        
         this.query =  this.query.find(JSON.parse(queryStr));  // if we await here we can't chain other query functions
 
         return this;

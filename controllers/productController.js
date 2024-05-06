@@ -83,7 +83,7 @@ exports.createProduct = async(req,res)=>{
 
 exports.getProducts = async(req,res)=>{
     try{
-       
+        const allProductsNumber = await productModel.countDocuments();
         let apiFeatures = new APIFeatures(productModel.find(),req.query)
         .filter()
         .sort()
@@ -94,6 +94,7 @@ exports.getProducts = async(req,res)=>{
         res.status(200).json({
             status:'success',
             results:products.length,
+            total:allProductsNumber,
             data:{products}
         });
     }catch(err){
@@ -122,7 +123,7 @@ exports.updateProduct = async(req, res) =>{
             new:true,
             runValidators:true
         });
-
+        newProudct.updateActualPrice();
         res.status(200).json({
             status:'success',
             data:{newProudct}
@@ -137,10 +138,13 @@ exports.updateProduct = async(req, res) =>{
 exports.deleteProductById = async(req,res)=>{
     try{
         await productModel.findByIdAndDelete(req.params.id);
-        var newData = await productModel.find();
+        const id = req.freshUser._id;
+        const user = await userModel.findById(id);
         res.status(202).json({
             status:'success',
-            data:newData
+            data:{
+                sellerProducts:user.sellerProducts
+            }
         });
     }catch(err){
         res.status(400).json({status:"fail",message: err.message});
